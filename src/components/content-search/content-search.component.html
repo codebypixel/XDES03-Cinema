@@ -1,0 +1,11 @@
+<div class="container">
+    <div class="text-search">
+        <h1 *ngIf="(searchText$ | async) === ''; else searchResult">
+            os filmes em no cineNTT
+          </h1>
+          <ng-template #searchResult>
+            <h1 class="w-25 p-3">Resultado da pesquisa: {{ searchText$ | async }}</h1>
+          </ng-template>
+    </div>
+</div>
+  
