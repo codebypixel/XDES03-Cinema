@@ -1,0 +1,49 @@
+<div class="container-base container-md">
+  <div *ngIf="movie;" class="d-flex flex-column flex-md-row justify-content-between">
+    <!-- Lado esquerdo: Título, descrição, atores, botão -->
+    <div class="movie-details w-100 w-md-60 mb-4 mb-md-0">
+      <h1 *ngIf="movie?.Title">{{ movie.Title }}</h1>
+      <p *ngIf="movie?.Plot" class="movie-description">{{ movie.Plot }}</p>
+
+      <!-- Verifica se os atores estão disponíveis e são diferentes de 'N/A' -->
+      <div *ngIf="movie?.Actors && movie?.Actors !== 'N/A'">
+        <p><strong>Atores:</strong></p>
+        <div class="d-flex flex-row actors-list">
+          <div *ngFor="let actor of movie?.Actors?.split(',')" class="actor-card text-center">
+            <div class="actor-photo rounded bg-light"></div>
+            <p class="actor-name">{{ actor.trim() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão de favoritos dentro da seção de detalhes do filme -->
+      <div class="favorite-button-container mt-4">
+        <button (click)="toggleFavorite()" class="btn btn-outline-secondary mt-3">
+          {{ isFavorite ? 'Remover dos favoritos ♥' : 'Adicionar aos favoritos ♥' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Lado direito: Pôster e avaliação -->
+    <div class="movie-poster w-100 w-md-40 text-end position-relative">
+      <div class="rating position-absolute top-50 start-0 translate-middle-y ms-3" *ngIf="movie?.imdbRating">
+        <div class="stars">
+          <i *ngFor="let star of getStarsArray(); let i = index"
+             class="text-warning me-1"
+             [class.bi-star-fill]="star === 1"
+             [class.bi-star-half]="star === 0.5"
+             [class.bi-star]="star === 0">
+          </i>
+        </div>
+      </div>                  
+      <img *ngIf="movie?.Poster" [src]="movie.Poster" alt="Poster" class="img-fluid rounded shadow">
+    </div>
+  </div>
+
+  <!-- Loader enquanto os dados são carregados -->
+  <div *ngIf="loading" class="container-base text-center">
+    <div class="spinner-grow text-light" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>

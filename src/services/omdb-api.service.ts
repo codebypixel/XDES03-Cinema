@@ -7,9 +7,10 @@ import { OMDbRequestByIdOrTitle, OMDbSearchRequest, OMDbMovie, OMDbSearchResult 
 @Injectable({
   providedIn: 'root'
 })
+
 export class OmdbApiService {
 
-  private readonly BASE_URL = 'http://www.omdbapi.com/';
+  private readonly BASE_URL = 'https://www.omdbapi.com/';
 
   constructor(private http: HttpClient) {}
 
