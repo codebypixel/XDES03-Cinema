@@ -10,6 +10,7 @@ export interface OMDbRequestByIdOrTitle {
   
   // Tipagem para requisição de busca
   export interface OMDbSearchRequest {
+    Search: never[];
     s: string;      // Movie title to search for
     type?: 'movie' | 'series' | 'episode';  // Type of result
     y?: string;     // Year of release

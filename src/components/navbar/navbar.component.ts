@@ -1,18 +1,29 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'navbar',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
 })
-export class NavbarComponent {
+export class NavbarComponent implements AfterViewInit {
   isDropdownVisible = false;
   isMenuVisible = false;
+  private searchTextChanged = new Subject<string>(); 
 
-  @Output() searchTextChanged = new EventEmitter<string>();
+  constructor(private searchService: SearchService) {
+    this.searchTextChanged.pipe(debounceTime(500)).subscribe((searchText) => {
+      console.log('Search text:', searchText);
+      this.searchService.emitSearchText(searchText); 
+    });
+  }
+  
+  ngAfterViewInit(): void {}
 
   toggleDropdown() {
     this.isDropdownVisible = !this.isDropdownVisible;
@@ -24,6 +35,6 @@ export class NavbarComponent {
 
   onSearchTextChanged(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
-    this.searchTextChanged.emit(inputElement.value);
+    this.searchTextChanged.next(inputElement.value); 
   }
 }
