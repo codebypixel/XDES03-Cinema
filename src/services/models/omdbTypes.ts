@@ -1,5 +1,3 @@
-// /src/services/models/omdbTypes.ts
-
 // Tipagem para requisição por ID ou título
 export interface OMDbRequestByIdOrTitle {
     i?: string;     // IMDb ID

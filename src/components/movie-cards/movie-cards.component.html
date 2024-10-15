@@ -1,0 +1,11 @@
+<div class="movie-grid">
+  <div class="movie-card" *ngFor="let movie of movies">
+    <div class="movie-card-shadow"></div>
+    <img [src]="'https://image.tmdb.org/t/p/w500' + movie.poster_path" alt="{{ movie.title }}">
+    <div class="movie-info">
+      <div class="release-date">{{ movie.release_date | date: 'MMM d, yyyy' }}</div>
+      <h2>{{ movie.title }}</h2>
+      <a [routerLink]="['/movie', movie.title]">Detalhes</a>
+    </div>
+  </div>
+</div>
