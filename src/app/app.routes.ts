@@ -11,7 +11,7 @@ export const routes: Routes = [
     path: 'emcartaz',
     component: ContentSearchComponent, 
   },
-  { 
+  {
     path: 'populares',
     component: ContentSearchComponent,
   },
@@ -20,7 +20,7 @@ export const routes: Routes = [
     component: MovieDetailsComponent, 
   },
   {
-    path: '**',
+    path: '**', 
     redirectTo: '', 
   },
 ];

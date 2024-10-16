@@ -1,72 +1,89 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
-import { RouterModule } from '@angular/router'; 
-import { MovieCardsComponent } from '../movie-cards/movie-cards.component'; 
-import { OMDbMovie } from '../../services/models/omdbTypes';
+import { Subscription } from 'rxjs';
+import { MovieCardsComponent } from '../movie-cards/movie-cards.component';
 import { TmdbService } from '../../services/tmdb-api.service';
+import { OMDbMovie, OMDbSearchRequest } from '../../services/models/omdbTypes';
+import { OmdbApiService } from '../../services/omdb-api.service';
+import { SearchService } from '../../services/search.service';
+import { TmdbMovie } from '../../services/models/tmdbTypes';
 
 @Component({
   selector: 'content-search',
   standalone: true,
-  imports: [CommonModule, RouterModule, MovieCardsComponent], 
+  imports: [CommonModule, MovieCardsComponent],
   templateUrl: './content-search.component.html',
   styleUrls: ['./content-search.component.scss'],
 })
-export class ContentSearchComponent implements OnInit {
-  searchText$ = new BehaviorSubject<string>('');
-  movies: OMDbMovie[] = []; 
+export class ContentSearchComponent implements OnInit, OnDestroy {
+  movies: OMDbMovie[] | TmdbMovie[] = [];
   loading = true;
+  private searchSubscription!: Subscription;
 
-  constructor(private tmdbService: TmdbService) {} 
+  constructor(private tmdbService: TmdbService, private searchService: SearchService, private omdbService: OmdbApiService) {}
 
   ngOnInit(): void {
-    this.loadPopularMovies(); 
-  }
-
-  // Método para carregar filmes populares
-  loadPopularMovies(page: number = 1): void {
-    this.loading = true; 
-    this.tmdbService.getPopularMovies(page).subscribe({
-      next: (response) => {
-        this.movies = response.results; 
-        this.loading = false; 
-      },
-      error: (error) => {
-        console.error('Erro ao buscar filmes populares:', error);
-        this.loading = false; 
-      },
-      complete: () => {
-        console.log('Requisição de filmes populares completa');
-      }
+    this.loadPopularMovies();
+    this.searchSubscription = this.searchService.getSearchTextObservable().subscribe((query) => {
+      this.searchMovies(query);
     });
   }
 
-  // Método para atualizar a busca de filmes
-  updateSearchText(text: string): void {
-    this.searchText$.next(text); 
-    if (text) {
-      this.searchMovies(text); 
-    } else {
-      this.loadPopularMovies(); 
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe(); 
     }
   }
 
-  // Método para buscar filmes com base na consulta
-  searchMovies(query: string): void {
+  loadPopularMovies(page: number = 1): void {
     this.loading = true;
-    this.tmdbService.searchMovies(query).subscribe({
+    this.tmdbService.getPopularMovies(page).subscribe({
       next: (response) => {
-        this.movies = response.results; 
-        this.loading = false; 
+        this.movies = response.results.map((movie: any) => ({
+          title: movie.title,
+          release_date: movie.release_date,
+          poster_path: 'https://image.tmdb.org/t/p/w500' + movie.poster_path,
+          }));
+        this.loading = false;
       },
       error: (error) => {
-        console.error('Erro ao buscar filmes:', error);
-        this.loading = false; 
+        console.error('Error fetching popular movies:', error);
+        this.loading = false;
       },
-      complete: () => {
-        console.log('Requisição de busca de filmes completa');
-      }
     });
   }
+  
+  private parseMovies(response: any): any[] {
+    return (response.Search || []).map((movie: any) => ({
+        title: movie.Title,
+        release_date: movie.Released,
+        poster_path: movie.Poster,
+    }));
+  }
+
+  searchMovies(query: string): void {
+    if(!query) {
+      this.loadPopularMovies();
+      return;
+    }
+    
+    this.loading = true;
+
+    const params: any = {
+        s: query, 
+        type: 'movie', 
+    };
+
+    this.omdbService.searchMovies(params).subscribe({
+        next: (response) => {
+          this.movies = this.parseMovies(response);
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Erro ao buscar filmes:', err);
+          this.loading = false;
+        }
+    });
+  }
+
 }

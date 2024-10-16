@@ -1,25 +1,17 @@
-<div class="container-content">
-  <!-- <div class="text-search">
-    <h1 *ngIf="(searchText$ | async) === ''; else searchResult">
-      os filmes em no cineNTT
-    </h1>
-    <ng-template #searchResult>
-      <h1 class="w-25 p-3">Resultado da pesquisa: {{ searchText$ | async }}</h1>
-    </ng-template>
-  </div> -->
-  <div *ngIf="!loading && movies.length > 0">
+<div *ngIf="!loading && movies.length > 0" class="container-content">
+  <div>
     <movie-cards [movies]="movies"></movie-cards>
   </div>
 </div>
 
 <div *ngIf="loading" class="container-base">
-    <div *ngIf="loading" class="spinner-grow text-light" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
+  <div *ngIf="loading" class="spinner-grow text-light" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
 </div>
 
 <div *ngIf="!loading && movies.length === 0" class="container-base">
-  <div *ngIf="!loading && movies.length === 0">
+  <div *ngIf="!loading && movies.length === 0"> 
     <p>Nenhum filme encontrado.</p>
   </div>
 </div>
