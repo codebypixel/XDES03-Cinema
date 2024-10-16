@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { SearchService } from '../../services/search.service';
+import { Router } from '@angular/router';  // Importando o Router
 
 @Component({
   selector: 'navbar',
@@ -14,15 +15,19 @@ import { SearchService } from '../../services/search.service';
 export class NavbarComponent implements AfterViewInit {
   isDropdownVisible = false;
   isMenuVisible = false;
-  private searchTextChanged = new Subject<string>(); 
+  private searchTextChanged = new Subject<string>();
 
-  constructor(private searchService: SearchService) {
+  constructor(private searchService: SearchService, private router: Router) { // Injetando o Router
     this.searchTextChanged.pipe(debounceTime(500)).subscribe((searchText) => {
-      console.log('Search text:', searchText);
-      this.searchService.emitSearchText(searchText); 
+      this.searchService.emitSearchText(searchText);
+      
+      if (searchText.trim()) {
+        // Navega para a rota /search sem recarregar o componente
+        this.router.navigate(['/search']);
+      }
     });
   }
-  
+
   ngAfterViewInit(): void {}
 
   toggleDropdown() {
@@ -35,6 +40,6 @@ export class NavbarComponent implements AfterViewInit {
 
   onSearchTextChanged(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
-    this.searchTextChanged.next(inputElement.value); 
+    this.searchTextChanged.next(inputElement.value);
   }
 }

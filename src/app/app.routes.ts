@@ -8,11 +8,11 @@ export const routes: Routes = [
     component: ContentSearchComponent, 
   },
   {
-    path: 'emcartaz',
-    component: ContentSearchComponent, 
+    path: 'populares',
+    component: ContentSearchComponent,
   },
   {
-    path: 'populares',
+    path: 'search',
     component: ContentSearchComponent,
   },
   {
