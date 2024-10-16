@@ -1,9 +1,12 @@
+<div *ngIf="loading" class="container-base">
+  <div class="spinner-grow text-light" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
 <div *ngIf="!loading && movies.length > 0" class="container-content">
   <div>
-    <!-- Exibir os filmes usando o MovieCardsComponent -->
     <movie-cards [movies]="movies"></movie-cards>
-
-    <!-- Pagination -->
     <nav *ngIf="totalPages > 1" class="mt-4">
       <ul class="pagination justify-content-center">
         <li class="page-item" [class.disabled]="currentPage === 1">
@@ -36,14 +39,6 @@
   </div>
 </div>
 
-<div *ngIf="loading" class="container-base">
-  <div *ngIf="loading" class="spinner-grow text-light" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</div>
-
-<div *ngIf="!loading && movies.length === 0" class="container-base">
-  <div *ngIf="!loading && movies.length === 0">
-    <p>Nenhum filme encontrado.</p>
-  </div>
-</div>
+<!-- <div *ngIf="movies.length === 0" class="container-base">
+  <p>Nenhum filme encontrado.</p>
+</div> -->

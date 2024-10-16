@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router'; // Adicionar Router para o redirecionamento
+import { ActivatedRoute, Router } from '@angular/router'; // Router para redirecionamento
 import { OmdbApiService } from '../../services/omdb-api.service';
 import { OMDbMovie } from '../../services/models/omdbTypes';
 import { CommonModule } from '@angular/common';
@@ -12,11 +12,15 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./movie-details.component.scss']
 })
 export class MovieDetailsComponent {
-  movie: OMDbMovie | null = null;
-  loading = true;
-  isFavorite = false; // Estado para saber se o filme já é favorito
+  movie: OMDbMovie | null = null;  
+  loading = true;                  
+  isFavorite = false;              
 
-  constructor(private route: ActivatedRoute, private omdbApiService: OmdbApiService, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private omdbApiService: OmdbApiService, 
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     const movieTitle = this.route.snapshot.paramMap.get('title');
@@ -25,18 +29,17 @@ export class MovieDetailsComponent {
         next: (res: OMDbMovie) => {
           if (res.Response === 'False') {
             this.loading = false;
-            this.redirectToHome();
+            this.redirectToHome(); 
           } else {
             this.movie = res;
             this.loading = false;
-            // Verificar se já é favorito
-            this.checkIfFavorite();
+            this.checkIfFavorite(); 
           }
         },
         error: (error: any) => {
           console.error('Erro ao buscar detalhes do filme:', error);
           this.loading = false;
-          this.redirectToHome();
+          this.redirectToHome(); 
         }
       });
     } else {
@@ -45,22 +48,19 @@ export class MovieDetailsComponent {
     }
   }
 
-  // Função para verificar se o filme já está nos favoritos
   checkIfFavorite(): void {
     if (typeof window !== 'undefined' && sessionStorage.getItem('emailLogado')) {
       const emailLogado = sessionStorage.getItem('emailLogado');
-      if (emailLogado && this.movie?.Title) {
+      if (emailLogado && this.movie?.imdbID) {
         const favoritos = JSON.parse(localStorage.getItem('favoritos') || '{}');
-        this.isFavorite = favoritos[emailLogado]?.includes(this.movie.Title);
+        this.isFavorite = favoritos[emailLogado]?.some((fav: any) => fav.imdbID === this.movie?.imdbID);
       }
     }
   }
-  
 
-  // Função para adicionar ou remover dos favoritos
   toggleFavorite(): void {
     const emailLogado = sessionStorage.getItem('emailLogado');
-    if (!emailLogado || !this.movie?.Title) return;
+    if (!emailLogado || !this.movie?.imdbID) return;
 
     let favoritos = JSON.parse(localStorage.getItem('favoritos') || '{}');
 
@@ -69,53 +69,48 @@ export class MovieDetailsComponent {
     }
 
     if (this.isFavorite) {
-      // Remover dos favoritos
-      favoritos[emailLogado] = favoritos[emailLogado].filter((title: string) => title !== this.movie?.Title);
+      favoritos[emailLogado] = favoritos[emailLogado].filter((fav: any) => fav.imdbID !== this.movie?.imdbID);
     } else {
-      // Adicionar aos favoritos
-      favoritos[emailLogado].push(this.movie?.Title);
+      favoritos[emailLogado].push(this.movie);
     }
 
-    // Atualizar no localStorage
     localStorage.setItem('favoritos', JSON.stringify(favoritos));
     this.isFavorite = !this.isFavorite;
   }
 
-  // Função para redirecionar à página inicial após mensagem de erro
   redirectToHome(): void {
     setTimeout(() => {
       this.router.navigate(['/']);
-    }, 3000); // Redireciona após 3 segundos
+    }, 3000); 
   }
+
 
   getStarClass(star: number): string {
     if (star === 1) {
-      return 'bi bi-star-fill'; // Estrela cheia
-    } else if (star <= 0.5 && star > 0) {
-      return 'bi bi-star-half'; // Meia estrela
+      return 'bi bi-star-fill'; 
+    } else if (star === 0.5) {
+      return 'bi bi-star-half'; 
     } else {
-      return 'bi bi-star'; // Estrela vazia
+      return 'bi bi-star'; 
     }
   }
-  // Função para gerar o array de estrelas baseado na avaliação
+
   getStarsArray(): number[] {
     const maxStars = 5;
-    
-    // Garantir que movie e imdbRating existem
+
     if (!this.movie || !this.movie.imdbRating) {
-      return Array(maxStars).fill(0); // Retorna 5 estrelas vazias se não houver rating
+      return Array(maxStars).fill(0);  
     }
-  
-    let rating = +this.movie.imdbRating / 2; // Ajustando o valor de 0-10 para 0-5
+
+    let rating = +this.movie.imdbRating / 2; 
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5 ? 0.5 : 0;
     const emptyStars = maxStars - fullStars - (halfStar ? 1 : 0);
-  
+
     return [
-      ...Array(fullStars).fill(1),   // Estrelas cheias
-      ...(halfStar ? [0.5] : []),    // Meia estrela
-      ...Array(emptyStars).fill(0)   // Estrelas vazias
+      ...Array(fullStars).fill(1),  
+      ...(halfStar ? [0.5] : []),   
+      ...Array(emptyStars).fill(0)   
     ];
   }
-  
 }

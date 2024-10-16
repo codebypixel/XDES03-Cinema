@@ -7,6 +7,8 @@ import { OMDbMovie, OMDbSearchRequest } from '../../services/models/omdbTypes';
 import { OmdbApiService } from '../../services/omdb-api.service';
 import { SearchService } from '../../services/search.service';
 import { TmdbMovie } from '../../services/models/tmdbTypes';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'content-search',
@@ -21,24 +23,46 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   totalPages: number = 1;
   private searchSubscription!: Subscription;
+  emailLogado: string = ''; 
+  favoriteMovies: string[] = []; 
 
   constructor(
     private tmdbService: TmdbService,
     private omdbService: OmdbApiService,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    const lastSearchText = this.searchService.getLastSearchText();
-    if (lastSearchText) {
-      this.searchMovies(lastSearchText, 1);
-    } else {
-      this.loadPopularMovies(1);
+    if (typeof window !== 'undefined') {
+      this.emailLogado = sessionStorage.getItem('emailLogado') || '';
+      
+      this.route.url.subscribe((urlSegment) => {
+        if (urlSegment.length > 0 && urlSegment[0].path === 'favoritos') {
+          this.loadFavorites();
+        } else {
+          const lastSearchText = this.searchService.getLastSearchText();
+          if (lastSearchText) {
+            this.searchMovies(lastSearchText, 1);
+          } else {
+            this.loadPopularMovies(1);
+          }
+  
+          this.searchSubscription = this.searchService.searchText$.subscribe((query) => {
+            this.searchMovies(query, 1);
+          });
+        }
+      });
     }
-
-    this.searchSubscription = this.searchService.searchText$.subscribe((query) => {
-      this.searchMovies(query, 1);
-    });
+  }
+  
+  loadFavorites(): void {
+    if (this.emailLogado) {
+      const favoritos = JSON.parse(localStorage.getItem('favoritos') || '{}');
+      this.favoriteMovies = favoritos[this.emailLogado] || [];
+      this.movies = this.parseFavoriteMovies(this.favoriteMovies); 
+      this.loading = false; 
+    }
   }
 
   loadPopularMovies(page: number = 1): void {
@@ -77,7 +101,7 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
 
     this.omdbService.searchMovies(params).subscribe({
       next: (response) => {
-        this.movies = this.parseMovies(response);
+        this.movies = this.parseOmdbMovies(response);
         this.totalPages = Math.ceil(Number(response.totalResults) / 10);
         this.currentPage = page;
         this.loading = false;
@@ -105,12 +129,9 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
     let startPage = Math.max(1, this.currentPage - 2);
     let endPage = Math.min(this.totalPages, this.currentPage + 2);
   
-    // Se estivermos próximos ao início, ajustamos o início
     if (this.currentPage <= 3) {
       endPage = Math.min(maxPagesToShow, this.totalPages);
-    }
-    // Se estivermos próximos ao fim, ajustamos o fim
-    else if (this.currentPage >= this.totalPages - 2) {
+    } else if (this.currentPage >= this.totalPages - 2) {
       startPage = Math.max(this.totalPages - maxPagesToShow + 1, 1);
     }
   
@@ -120,10 +141,17 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
   
     return pagesToShow;
   }
-  
 
-  parseMovies(response: any): OMDbMovie[] {
+  parseOmdbMovies(response: any): OMDbMovie[] {
     return response.Search.map((movie: any) => ({
+      title: movie.Title,
+      release_date: movie.Year,
+      poster_path: movie.Poster !== 'N/A' ? movie.Poster : 'na-movie.png',
+    }));
+  }
+
+  parseFavoriteMovies(response: any): OMDbMovie[] {
+    return response.map((movie: any) => ({
       title: movie.Title,
       release_date: movie.Year,
       poster_path: movie.Poster !== 'N/A' ? movie.Poster : 'na-movie.png',

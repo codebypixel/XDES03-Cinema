@@ -1,4 +1,4 @@
-$primary-bg-color: #f0f0f0;
+$primary-bg-color: #1f2937;
 $navbar-bg-color: #1f2937;
 $navbar-item-bg-color: #4b5563;
 $navbar-item-active-bg-color: #111827;
@@ -14,6 +14,25 @@ $input-border-focus-color: #60a5fa;
   box-sizing: border-box;
 }
 
+.pagination {
+  --bs-pagination-bg: $navbar-bg-color; 
+  --bs-pagination-color: #fff; 
+  --bs-pagination-border-color: #4b5563;
+  --bs-pagination-hover-bg: $navbar-item-bg-color; 
+  --bs-pagination-hover-color: #fff; 
+  --bs-pagination-hover-border-color: #fff; 
+  --bs-pagination-active-bg: $navbar-item-active-bg-color; 
+  --bs-pagination-active-color: #ffffff;
+  --bs-pagination-disabled-bg: $navbar-bg-color; 
+  --bs-pagination-disabled-border-color: #4b5563; 
+  --bs-pagination-disabled-color: #6b7280; 
+  --bs-pagination-focus-bg: $navbar-item-bg-color;
+  --bs-pagination-padding-x: 1rem;
+  --bs-pagination-padding-y: 0.8rem;
+  --bs-pagination-font-size: 1rem;
+  --bs-pagination-border-radius: 0.25rem;
+}
+
 body {
   font-family: "Inter", sans-serif;
   background-color: $primary-bg-color;
@@ -26,7 +45,7 @@ main {
   height: auto;
 }
 
-h1, p{
+h1, p {
     color: #fff;
 }
 
