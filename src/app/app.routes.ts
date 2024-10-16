@@ -12,6 +12,11 @@ export const routes: Routes = [
     component: ContentSearchComponent,
   },
   {
+    path: 'favoritos',
+    component: ContentSearchComponent,
+    
+  },
+  {
     path: 'search',
     component: ContentSearchComponent,
   },
