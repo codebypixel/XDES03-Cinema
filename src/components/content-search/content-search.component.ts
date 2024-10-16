@@ -20,18 +20,30 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
   loading = true;
   private searchSubscription!: Subscription;
 
-  constructor(private tmdbService: TmdbService, private searchService: SearchService, private omdbService: OmdbApiService) {}
+  constructor(
+    private tmdbService: TmdbService,
+    private searchService: SearchService,
+    private omdbService: OmdbApiService
+  ) {}
 
   ngOnInit(): void {
-    this.loadPopularMovies();
-    this.searchSubscription = this.searchService.getSearchTextObservable().subscribe((query) => {
+    // Pegue o último termo de busca e faça a busca correspondente
+    const lastSearchText = this.searchService.getLastSearchText();
+    if (lastSearchText) {
+      this.searchMovies(lastSearchText);  // Recarrega os resultados com o último termo de busca
+    } else {
+      this.loadPopularMovies();  // Carrega filmes populares se não houver termo de busca
+    }
+
+    // Subscrição para mudanças no texto de busca
+    this.searchSubscription = this.searchService.searchText$.subscribe((query) => {
       this.searchMovies(query);
     });
   }
 
   ngOnDestroy(): void {
     if (this.searchSubscription) {
-      this.searchSubscription.unsubscribe(); 
+      this.searchSubscription.unsubscribe();
     }
   }
 
@@ -43,7 +55,7 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
           title: movie.title,
           release_date: movie.release_date,
           poster_path: 'https://image.tmdb.org/t/p/w500' + movie.poster_path,
-          }));
+        }));
         this.loading = false;
       },
       error: (error) => {
@@ -52,38 +64,37 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
       },
     });
   }
-  
-  private parseMovies(response: any): any[] {
-    return (response.Search || []).map((movie: any) => ({
-        title: movie.Title,
-        release_date: movie.Released,
-        poster_path: movie.Poster,
-    }));
-  }
 
   searchMovies(query: string): void {
-    if(!query) {
+    if (!query) {
       this.loadPopularMovies();
       return;
     }
-    
+
     this.loading = true;
 
     const params: any = {
-        s: query, 
-        type: 'movie', 
+      s: query,
+      type: 'movie',
     };
 
     this.omdbService.searchMovies(params).subscribe({
-        next: (response) => {
-          this.movies = this.parseMovies(response);
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Erro ao buscar filmes:', err);
-          this.loading = false;
-        }
+      next: (response) => {
+        this.movies = this.parseMovies(response);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Erro ao buscar filmes:', err);
+        this.loading = false;
+      },
     });
   }
 
+  private parseMovies(response: any): any[] {
+    return (response.Search || []).map((movie: any) => ({
+      title: movie.Title,
+      release_date: movie.Released,
+      poster_path: movie.Poster,
+    }));
+  }
 }

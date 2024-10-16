@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SearchService {
-  private searchSubject = new Subject<string>();
+  private searchTextSubject = new BehaviorSubject<string>('');  // Armazena o último termo de busca
+  searchText$ = this.searchTextSubject.asObservable();
 
-  emitSearchText(searchText: string) {
-    this.searchSubject.next(searchText);
+  emitSearchText(searchText: string): void {
+    this.searchTextSubject.next(searchText);  // Armazena o termo de busca atual
   }
 
-  getSearchTextObservable() {
-    return this.searchSubject.asObservable();
+  getLastSearchText(): string {
+    return this.searchTextSubject.getValue();  // Retorna o último termo de busca
   }
 }
