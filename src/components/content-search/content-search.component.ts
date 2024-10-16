@@ -18,33 +18,27 @@ import { TmdbMovie } from '../../services/models/tmdbTypes';
 export class ContentSearchComponent implements OnInit, OnDestroy {
   movies: OMDbMovie[] | TmdbMovie[] = [];
   loading = true;
+  currentPage: number = 1;
+  totalPages: number = 1;
   private searchSubscription!: Subscription;
 
   constructor(
     private tmdbService: TmdbService,
-    private searchService: SearchService,
-    private omdbService: OmdbApiService
+    private omdbService: OmdbApiService,
+    private searchService: SearchService
   ) {}
 
   ngOnInit(): void {
-    // Pegue o último termo de busca e faça a busca correspondente
     const lastSearchText = this.searchService.getLastSearchText();
     if (lastSearchText) {
-      this.searchMovies(lastSearchText);  // Recarrega os resultados com o último termo de busca
+      this.searchMovies(lastSearchText, 1);
     } else {
-      this.loadPopularMovies();  // Carrega filmes populares se não houver termo de busca
+      this.loadPopularMovies(1);
     }
 
-    // Subscrição para mudanças no texto de busca
     this.searchSubscription = this.searchService.searchText$.subscribe((query) => {
-      this.searchMovies(query);
+      this.searchMovies(query, 1);
     });
-  }
-
-  ngOnDestroy(): void {
-    if (this.searchSubscription) {
-      this.searchSubscription.unsubscribe();
-    }
   }
 
   loadPopularMovies(page: number = 1): void {
@@ -56,6 +50,8 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
           release_date: movie.release_date,
           poster_path: 'https://image.tmdb.org/t/p/w500' + movie.poster_path,
         }));
+        this.totalPages = 500;
+        this.currentPage = page;
         this.loading = false;
       },
       error: (error) => {
@@ -65,9 +61,9 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
     });
   }
 
-  searchMovies(query: string): void {
+  searchMovies(query: string, page: number = 1): void {
     if (!query) {
-      this.loadPopularMovies();
+      this.loadPopularMovies(page);
       return;
     }
 
@@ -76,11 +72,14 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
     const params: any = {
       s: query,
       type: 'movie',
+      page: page,
     };
 
     this.omdbService.searchMovies(params).subscribe({
       next: (response) => {
         this.movies = this.parseMovies(response);
+        this.totalPages = Math.ceil(Number(response.totalResults) / 10);
+        this.currentPage = page;
         this.loading = false;
       },
       error: (err) => {
@@ -90,11 +89,50 @@ export class ContentSearchComponent implements OnInit, OnDestroy {
     });
   }
 
-  private parseMovies(response: any): any[] {
-    return (response.Search || []).map((movie: any) => ({
+  onPageChange(newPage: number): void {
+    const lastSearchText = this.searchService.getLastSearchText();
+    if (lastSearchText) {
+      this.searchMovies(lastSearchText, newPage);
+    } else {
+      this.loadPopularMovies(newPage);
+    }
+  }
+
+  getPagesToShow(): number[] {
+    const pagesToShow: number[] = [];
+    const maxPagesToShow = 5;
+    
+    let startPage = Math.max(1, this.currentPage - 2);
+    let endPage = Math.min(this.totalPages, this.currentPage + 2);
+  
+    // Se estivermos próximos ao início, ajustamos o início
+    if (this.currentPage <= 3) {
+      endPage = Math.min(maxPagesToShow, this.totalPages);
+    }
+    // Se estivermos próximos ao fim, ajustamos o fim
+    else if (this.currentPage >= this.totalPages - 2) {
+      startPage = Math.max(this.totalPages - maxPagesToShow + 1, 1);
+    }
+  
+    for (let i = startPage; i <= endPage; i++) {
+      pagesToShow.push(i);
+    }
+  
+    return pagesToShow;
+  }
+  
+
+  parseMovies(response: any): OMDbMovie[] {
+    return response.Search.map((movie: any) => ({
       title: movie.Title,
-      release_date: movie.Released,
-      poster_path: movie.Poster,
+      release_date: movie.Year,
+      poster_path: movie.Poster !== 'N/A' ? movie.Poster : 'na-movie.png',
     }));
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
   }
 }
