@@ -13,7 +13,12 @@ export class TmdbService {
   constructor(private http: HttpClient) {}
 
   getPopularMovies(page: number = 1): Observable<any> {
-    const params = new HttpParams().set('api_key', this.apiKey).set('page', page.toString());
+
+    const params = new HttpParams()   
+    .set('api_key', this.apiKey)
+    .set('page', page.toString())
+    .set('include_adult', 'false') 
+
     return this.http.get(`${this.BASE_URL}/movie/popular`, { params });
   }
 

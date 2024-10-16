@@ -20,7 +20,7 @@ export class OmdbApiService {
   }
 
   searchMovies(params: OMDbSearchRequest): Observable<OMDbSearchResult> {
-    const httpParams = new HttpParams({ fromObject: { ...params, apikey: environment.omdbApiKey } });
+    const httpParams = new HttpParams({ fromObject: { ...params, apikey: environment.omdbApiKey, page: params.page?.toString() || '1' } });
     return this.http.get<OMDbSearchResult>(this.BASE_URL, { params: httpParams });
   }
 }
