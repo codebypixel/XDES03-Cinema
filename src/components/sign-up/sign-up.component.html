@@ -1,6 +1,6 @@
 <div class="container d-flex align-items-center justify-content-center vh-100">
   <div class="card shadow p-4 text-center" style="width: 400px">
-    <h2 class="text-center mb-4">Login</h2>
+    <h2 class="text-center mb-4 ">Cadastre-se</h2>
     <form (ngSubmit)="onSubmit()">
       <div class="mb-3">
         <div class="position-relative d-flex justify-content-center">
@@ -33,10 +33,10 @@
         </div>
       </div>
       <div class="mb-3">
-        <label for="name" class="form-label">Nome</label>
+        <label for="name" class="form-label w-100 text-start">Nome</label>
         <input
           type="text"
-          class="form-control text-center"
+          class="form-control text-start"
           id="name"
           [(ngModel)]="name"
           name="name"
@@ -44,17 +44,17 @@
         />
       </div>
       <div class="mb-3">
-        <label for="email" class="form-label">E-mail</label>
+        <label for="email" class="form-label w-100 text-start">E-mail</label>
         <input
           type="email"
-          class="form-control text-center"
+          class="form-control text-start"
           id="email"
           [(ngModel)]="email"
           name="email"
           required
         />
       </div>
-      <button type="submit" class="btn btn-primary w-100">Entrar</button>
+      <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
     </form>
   </div>
 </div>

@@ -1,10 +1,10 @@
+import { Router } from '@angular/router';
 import { Component, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { SearchService } from '../../services/search.service';
-import { Router } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
+
+import { SearchService } from '@services/search.service';
 
 @Component({
   selector: 'navbar',
@@ -17,17 +17,17 @@ export class NavbarComponent implements AfterViewInit {
   isDropdownVisible = false;
   isMenuVisible = false;
   private searchTextChanged = new Subject<string>();
-  usuarioImagem: any = null; 
+  usuarioImagem: any = null;
   searchText: string = '';
 
   constructor(
-    private searchService: SearchService, 
+    private searchService: SearchService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.searchTextChanged.pipe(debounceTime(500)).subscribe((searchText) => {
       this.searchService.emitSearchText(searchText);
-      
+
       if (searchText.trim()) {
         this.router.navigate(['/search']);
       }
@@ -57,10 +57,10 @@ export class NavbarComponent implements AfterViewInit {
     if (isPlatformBrowser(this.platformId)) {
       const emailLogado = sessionStorage.getItem('emailLogado');
       const dadosUsuariosLocais = localStorage.getItem('dadosUsuariosLocais');
-      
+
       if (emailLogado && dadosUsuariosLocais) {
         const dadosUsuarios = JSON.parse(dadosUsuariosLocais);
-        return dadosUsuarios[emailLogado]; 
+        return dadosUsuarios[emailLogado];
       }
     }
     return null;
