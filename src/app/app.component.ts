@@ -1,16 +1,19 @@
 import { Component, ViewChild, OnInit, Inject, PLATFORM_ID } from '@angular/core';
-import { ContentSearchComponent } from '../components/content-search/content-search.component';
-import { NavbarComponent } from '../components/navbar/navbar.component';
-import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
-import { FooterComponent } from '../components/footer/footer.component';
-import { filter } from 'rxjs/operators';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
-import { AuthService } from '../services/auth.service';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
+
+import { AngularToastifyModule } from 'angular-toastify';
+
+import { ContentSearchComponent } from '@components/content-search/content-search.component';
+import { NavbarComponent } from '@components/navbar/navbar.component';
+import { FooterComponent } from '@components/footer/footer.component';
+import { AuthService } from '@services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, ContentSearchComponent, CommonModule],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ContentSearchComponent, CommonModule, AngularToastifyModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

@@ -20,8 +20,8 @@
             alt="User Avatar"
             class="dropdown-avatar"
           />
-          <div>
-            <span>{{ usuarioImagem?.nome }}</span>
+          <div class="text-wrap" style="max-width: 120px;">
+            <span class="text-truncate">{{ usuarioImagem?.nome }}</span>
           </div>
         </div>
         <a (click)="signOut()" class="dropdown-item">Sign out</a>

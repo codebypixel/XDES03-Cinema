@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-import { MovieCardsComponent } from '../movie-cards/movie-cards.component';
-import { TmdbService } from '../../services/tmdb-api.service';
-import { OMDbMovie, OMDbSearchRequest } from '../../services/models/omdbTypes';
-import { OmdbApiService } from '../../services/omdb-api.service';
-import { SearchService } from '../../services/search.service';
-import { TmdbMovie } from '../../services/models/tmdbTypes';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
+import { MovieCardsComponent } from '@components/movie-cards/movie-cards.component';
+import { TmdbService } from '@services/tmdb-api.service';
+import { OMDbMovie, OMDbSearchRequest } from '@services/models/omdbTypes';
+import { OmdbApiService } from '@services/omdb-api.service';
+import { SearchService } from '@services/search.service';
+import { TmdbMovie } from '@services/models/tmdbTypes';
 
 @Component({
   selector: 'content-search',

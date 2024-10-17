@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router'; // Router para redirecionamento
-import { OmdbApiService } from '../../services/omdb-api.service';
-import { OMDbMovie } from '../../services/models/omdbTypes';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router'; 
+import { OmdbApiService } from '@services/omdb-api.service';
+import { OMDbMovie } from '@services/models/omdbTypes';
 
 @Component({
   selector: 'app-movie-details',
