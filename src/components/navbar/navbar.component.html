@@ -1,30 +1,39 @@
 <nav class="navbar-container">
-    <div class="navbar-top">
-        <div class="navbar-brand">
-            <img src="logo.svg" alt="Logo" class="logo">
-        </div> 
-        <div class="search-container">
-            <input type="text" placeholder="Search" (input)="onSearchTextChanged($event)" class="search-input">
-        </div>
-        <div class="profile" (click)="toggleDropdown()">
-            <img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSmV1dNGD32jpnEkX59YxmtcH10Wx3_h9ghPEwmFDIOigMOdT4rao_ywqs-f8D-Nubd1SF_MFo-aDXh4xQ-nFVjHpyz2HrunhOsoH4K0yA" alt="User Avatar" class="avatar">
-            <div class="dropdown-menu" [class.show]="isDropdownVisible">
-                <div class="dropdown-header">
-                    <img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSmV1dNGD32jpnEkX59YxmtcH10Wx3_h9ghPEwmFDIOigMOdT4rao_ywqs-f8D-Nubd1SF_MFo-aDXh4xQ-nFVjHpyz2HrunhOsoH4K0yA" alt="User Avatar" class="dropdown-avatar">
-                    <div>
-                        <span>Tom Cook</span>
-                        <span>tomasdexample.com</span>
-                    </div>
-                </div>
-                <a href="/" class="dropdown-item">Sign out</a>
-            </div>
-        </div>
+  <div class="navbar-top">
+    <div class="navbar-brand">
+      <img src="logo.svg" alt="Logo" class="logo" />
     </div>
-    <div class="navbar-bottom">
-        <div class="menu-toggle" (click)="toggleMenu()">&#9776;</div>
-        <div class="menu">
-            <a href="/populares" class="menu-item">Populares</a>
-            <a href="/favoritos" class="menu-item">Favoritos</a>
-        </div>
+    <div class="search-container">
+      <input
+        type="text"
+        placeholder="Buscar filme"
+        (input)="onSearchTextChanged($event)"
+        class="search-input"
+      />
     </div>
+    <div class="profile" (click)="toggleDropdown()">
+      <img [src]="usuarioImagem?.photo" alt="User Avatar" class="avatar" />
+      <div class="dropdown-menu" [class.show]="isDropdownVisible">
+        <div class="dropdown-header">
+          <img
+            [src]="usuarioImagem?.photo"
+            alt="User Avatar"
+            class="dropdown-avatar"
+          />
+          <div>
+            <span>{{ usuarioImagem?.nome }}</span>
+          </div>
+        </div>
+        <a (click)="signOut()" class="dropdown-item">Sign out</a>
+      </div>
+    </div>
+  </div>
+  <div class="navbar-bottom">
+    <div class="menu" [class.show]="isMenuVisible">
+      <div class="d-flex">
+        <div (click)="navigateToPopulares()" class="menu-item">Populares</div>
+        <div (click)="navigateToFavoritos()" class="menu-item">Favoritos</div>
+      </div>
+    </div>
+  </div>
 </nav>

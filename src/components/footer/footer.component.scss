@@ -18,3 +18,12 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    .footer-container {
+        height: 160px;
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+    }
+}

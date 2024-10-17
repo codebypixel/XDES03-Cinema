@@ -119,6 +119,22 @@
   margin-top: 1rem;
 }
 
-.spinner-grow {
-  margin: 2rem auto;
+@media ((min-width: 320px) and (max-width: 1024px)) {
+  .container-base {
+    flex-direction: row;
+    align-items: flex-start;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .movie-details {
+    width: 60%;
+    margin-bottom: 0;
+  }
+
+  .movie-poster {
+    width: 40%;
+    text-align: right;
+  }
+
 }
