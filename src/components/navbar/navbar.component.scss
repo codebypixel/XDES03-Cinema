@@ -68,6 +68,7 @@
         padding: 8px 16px;
         border-radius: 4px;
         transition: background-color 0.3s;
+        cursor: pointer;
 
         &:hover {
           background-color: #4b5563;
@@ -166,7 +167,6 @@
     .menu {
       flex-direction: column;
       width: 100%;
-      display: none;
 
       .menu-item {
         margin: 5px 0;

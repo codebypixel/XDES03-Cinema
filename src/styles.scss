@@ -43,6 +43,7 @@ main {
   justify-content: center;
   align-items: center;
   height: auto;
+  background-color: $primary-bg-color;
 }
 
 h1, p {
@@ -60,4 +61,12 @@ p {
   width: 100%;
   height: calc(100vh - 240px);
   padding: 0 32px;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    --bs-pagination-padding-x: 0.75rem;
+    --bs-pagination-padding-y: 0.75rem;
+    --bs-pagination-font-size: 0.8rem;
+  }
 }
