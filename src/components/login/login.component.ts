@@ -1,8 +1,9 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastService } from 'angular-toastify';
+import { AuthenticatorService } from '@services/authenticator.service';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -13,26 +14,41 @@ import { ToastService } from 'angular-toastify';
 })
 export class LoginComponent {
   email: string = '';
+  password: string = '';
 
-  constructor(private router: Router, private toastService: ToastService) {}
+  constructor(
+    private router: Router,
+    private toastService: ToastService,
+    private authService: AuthenticatorService
+  ) {}
 
   onSubmit(): void {
-    if (!this.email || !this.isValidEmail(this.email)) {
-      this.toastService.warn('Por favor, insira um e-mail válido.');
+    if (!this.email || !this.password || !this.isValidEmail(this.email)) {
+      this.toastService.warn('Por favor, insira um e-mail e senha válidos.');
       return;
     }
 
-    const dadosUsuariosLocais = JSON.parse(
-      localStorage.getItem('dadosUsuariosLocais') || '{}'
-    );
-
-    if (dadosUsuariosLocais[this.email]) {
-      sessionStorage.setItem('emailLogado', this.email);
-      this.toastService.success('Login realizado com sucesso!');
-      this.router.navigate(['/populares']);
-    } else {
-      this.toastService.error('Usuário não encontrado. Verifique seu e-mail.');
-    }
+    this.authService.login(this.email, this.password).subscribe({
+      next: (response: any) => {
+        if (response.message === 'Autenticado com Sucesso') {
+          sessionStorage.setItem('emailLogado', this.email);
+          this.toastService.success('Login realizado com sucesso!');
+          this.router.navigate(['/populares']);
+        } else {
+          this.toastService.error(response);
+        }
+      },
+      error: (err: any) => {
+        console.log(err.error.message);
+        if(err.error.message === 'Email inválido') {
+          this.toastService.error('Email inválido');
+        } else if (err.error.message === 'Senha incorreta') {
+          this.toastService.error('Senha incorreta');
+        } else {
+          this.toastService.error('Erro ao se comunicar com o servidor.');
+        }
+      },
+    });
   }
 
   isValidEmail(email: string): boolean {
