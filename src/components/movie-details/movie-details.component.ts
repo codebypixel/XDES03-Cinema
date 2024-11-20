@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router'; 
 import { OmdbApiService } from '@services/omdb-api.service';
 import { OMDbMovie } from '@services/models/omdbTypes';
-import { FavoritesService } from '@services/favorites.service';
 
 @Component({
   selector: 'app-movie-details',
@@ -20,19 +19,11 @@ export class MovieDetailsComponent {
   constructor(
     private route: ActivatedRoute, 
     private omdbApiService: OmdbApiService, 
-    private router: Router,
-    private favoritesService: FavoritesService // Serviço de favoritos
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     const movieTitle = this.route.snapshot.paramMap.get('title');
-    const emailLogado = sessionStorage.getItem('emailLogado');
-
-    if (!emailLogado) {
-      this.redirectToHome();
-      return;
-    }
-
     if (movieTitle) {
       this.omdbApiService.fetchMovieByIdOrTitle({ t: movieTitle }).subscribe({
         next: (res: OMDbMovie) => {
@@ -42,7 +33,7 @@ export class MovieDetailsComponent {
           } else {
             this.movie = res;
             this.loading = false;
-            this.checkIfFavorite(emailLogado); 
+            this.checkIfFavorite(); 
           }
         },
         error: (error: any) => {
@@ -57,42 +48,34 @@ export class MovieDetailsComponent {
     }
   }
 
-  checkIfFavorite(email: string): void {
-    if (!this.movie?.imdbID) return;
-
-    this.favoritesService.getFavorites(email).subscribe({
-      next: (favoritos) => {
-        this.isFavorite = favoritos.some((fav) => fav.imdbID === this.movie?.imdbID);
-      },
-      error: (error) => {
-        console.error('Erro ao verificar favoritos:', error);
+  checkIfFavorite(): void {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('emailLogado')) {
+      const emailLogado = sessionStorage.getItem('emailLogado');
+      if (emailLogado && this.movie?.imdbID) {
+        const favoritos = JSON.parse(localStorage.getItem('favoritos') || '{}');
+        this.isFavorite = favoritos[emailLogado]?.some((fav: any) => fav.imdbID === this.movie?.imdbID);
       }
-    });
+    }
   }
 
   toggleFavorite(): void {
     const emailLogado = sessionStorage.getItem('emailLogado');
     if (!emailLogado || !this.movie?.imdbID) return;
 
-    if (this.isFavorite) {
-      this.favoritesService.removeFavorite(emailLogado, this.movie.imdbID).subscribe({
-        next: () => {
-          this.isFavorite = false;
-        },
-        error: (error) => {
-          console.error('Erro ao remover dos favoritos:', error);
-        }
-      });
-    } else {
-      this.favoritesService.addFavorite(emailLogado, this.movie).subscribe({
-        next: () => {
-          this.isFavorite = true;
-        },
-        error: (error) => {
-          console.error('Erro ao adicionar aos favoritos:', error);
-        }
-      });
+    let favoritos = JSON.parse(localStorage.getItem('favoritos') || '{}');
+
+    if (!favoritos[emailLogado]) {
+      favoritos[emailLogado] = [];
     }
+
+    if (this.isFavorite) {
+      favoritos[emailLogado] = favoritos[emailLogado].filter((fav: any) => fav.imdbID !== this.movie?.imdbID);
+    } else {
+      favoritos[emailLogado].push(this.movie);
+    }
+
+    localStorage.setItem('favoritos', JSON.stringify(favoritos));
+    this.isFavorite = !this.isFavorite;
   }
 
   redirectToHome(): void {
@@ -101,7 +84,7 @@ export class MovieDetailsComponent {
     }, 3000); 
   }
 
-  // Função para retornar a classe CSS apropriada para a estrela
+
   getStarClass(star: number): string {
     if (star === 1) {
       return 'bi bi-star-fill'; 
@@ -112,7 +95,6 @@ export class MovieDetailsComponent {
     }
   }
 
-  // Função para gerar um array representando as estrelas
   getStarsArray(): number[] {
     const maxStars = 5;
 
